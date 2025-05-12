@@ -73,7 +73,7 @@
 &kp ESC           &kp LEFT_WIN  &kp LEFT_ALT  &mt LCTRL F7  &lt 1 SPACE  &kp LC(SPACE)      &kp BACKSPACE  &lt 2 ENTER                             &kp RA(ENTER)
             >;
 
-            sensor-bindings = <&inc_dec_kp K_SCROLL_DOWN K_SCROLL_UP>;
+            sensor-bindings = <&inc_dec_kp LEFT_ARROW RIGHT_ARROW>;
         };
 
         FUNCTION {
