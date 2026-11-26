@@ -1,0 +1,13 @@
+version: v2
+inputs:
+  - directory: ../modules/runtime-input-processor/proto
+plugins:
+  - local: protoc-gen-ts_proto
+    opt:
+      - outputServices=false
+      - outputJsonMethods=false
+      - outputClientImpl=false
+      - useExactTypes=false
+      - esModuleInterop=true
+      - enumsAsLiterals=true
+    out: src/proto
