@@ -9,8 +9,8 @@
 };
 
 &trackball {
-    automouse-layer = <4>;
-    scroll-layers = <5>;
+    // オートマウス（レイヤー4）とスクロール（レイヤー5）は、
+    // 設定アプリから調整できるよう roBa_R.overlay の入力プロセッサで処理しています。
 
     // arrows {
     //     layers = <3>;

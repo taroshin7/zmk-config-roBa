@@ -1,4 +1,6 @@
 #include "roBa.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <dt-bindings/zmk/keys.h>
 
 &default_transform {
     col-offset = <6>;
@@ -19,6 +21,57 @@
         status = "okay";
         compatible = "zmk,input-listener";
         device = <&trackball>;
+        input-processors = <&roba_mouse_rip>;
+
+        // レイヤー5（SCROLL）を押している間はスクロールに切り替え
+        scroller {
+            layers = <5>;
+            input-processors = <&roba_scroll_rip>;
+        };
+    };
+
+    // カーソル：速さ・回転・オートマウス（レイヤー4）を設定アプリから変更可能
+    roba_mouse_rip: roba_mouse_rip {
+        compatible = "zmk,input-processor-runtime";
+        processor-label = "mouse";
+        type = <INPUT_EV_REL>;
+        x-codes = <INPUT_REL_X>;
+        y-codes = <INPUT_REL_Y>;
+        scale-multiplier = <1>;
+        scale-divisor = <1>;
+        rotation-degrees = <0>;
+        track-remainders;
+
+        // 従来のオートマウス（玉を動かすとレイヤー4、止めて700msで戻る）と同じ初期値
+        temp-layer-enabled;
+        temp-layer = <4>;
+        temp-layer-activation-delay-ms = <100>;
+        temp-layer-deactivation-delay-ms = <700>;
+        temp-layer-transparent-behavior = <&trans>;
+        temp-layer-kp-behavior = <&kp>;
+        temp-layer-keep-keycodes = <LEFT_CONTROL LEFT_SHIFT LEFT_ALT LEFT_GUI RIGHT_CONTROL RIGHT_SHIFT RIGHT_ALT RIGHT_GUI>;
+
+        #input-processor-cells = <0>;
+    };
+
+    // スクロール：従来と同じく16カウントで1ノッチ、縦は上下反転・横はそのまま
+    roba_scroll_rip: roba_scroll_rip {
+        compatible = "zmk,input-processor-runtime";
+        processor-label = "scroll";
+        type = <INPUT_EV_REL>;
+        x-codes = <INPUT_REL_X>;
+        y-codes = <INPUT_REL_Y>;
+        scale-multiplier = <1>;
+        scale-divisor = <16>;
+        rotation-degrees = <0>;
+        track-remainders;
+        xy-to-scroll-enabled;
+        y-invert;
+        temp-layer-transparent-behavior = <&trans>;
+        temp-layer-kp-behavior = <&kp>;
+        temp-layer-keep-keycodes = <LEFT_CONTROL LEFT_SHIFT LEFT_ALT LEFT_GUI RIGHT_CONTROL RIGHT_SHIFT RIGHT_ALT RIGHT_GUI>;
+
+        #input-processor-cells = <0>;
     };
 };
 

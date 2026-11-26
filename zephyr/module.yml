@@ -1,4 +1,9 @@
 name: roBa
 build:
+  # トラックボール設定アプリ用：cormoran/zmk-module-runtime-input-processor (MIT, d61c912) を
+  # ZMK v0.3 に合わせて同梱（modules/runtime-input-processor）
+  cmake: modules/runtime-input-processor
+  kconfig: modules/runtime-input-processor/Kconfig
   settings:
     board_root: .
+    dts_root: modules/runtime-input-processor
