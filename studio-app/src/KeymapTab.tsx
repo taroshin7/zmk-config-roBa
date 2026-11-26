@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Backend, BehaviorInfo, Binding, KeymapData, ParamDesc } from "./backend";
 import { behaviorJa, keyFace, layerName } from "./bindingLabel";
 import { KeyPicker } from "./KeyPicker";
+import { StoragePanel, type ApplyTarget } from "./StoragePanel";
+import { resolveBinding, sameBinding } from "./storage";
 
 const U = 64; // 1キーあたりのピクセル
 
@@ -13,6 +15,7 @@ export function KeymapTab({ backend }: { backend: Backend }) {
   const [unsaved, setUnsaved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [progress, setProgress] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     try {
@@ -59,6 +62,58 @@ export function KeymapTab({ backend }: { backend: Backend }) {
     await reload();
     setMsg("保存していない変更を取り消しました");
     setBusy(false);
+  };
+
+  // 保存したキーマップを適用：変わるキーだけ書き込み、最後にキーボードに保存する
+  const applyStored = async (targets: ApplyTarget[], label: string) => {
+    setBusy(true);
+    setSel(null);
+    let changed = 0;
+    let skipped = 0;
+    let failed = 0;
+    const todo: { layerId: number; pos: number; b: NonNullable<ReturnType<typeof resolveBinding>> }[] = [];
+    for (const t of targets) {
+      const l = data.layers[t.index];
+      if (!l) continue;
+      const n = Math.min(l.bindings.length, t.layer.bindings.length);
+      for (let pos = 0; pos < n; pos++) {
+        const b = resolveBinding(t.layer.bindings[pos], data.behaviors);
+        if (!b) {
+          skipped++;
+          continue;
+        }
+        if (!sameBinding(l.bindings[pos], b)) todo.push({ layerId: l.id, pos, b });
+      }
+    }
+    try {
+      for (let i = 0; i < todo.length; i++) {
+        setProgress(`「${label}」を適用中… ${i + 1} / ${todo.length}`);
+        const e = await backend.setBinding(todo[i].layerId, todo[i].pos, todo[i].b);
+        if (e) failed++;
+        else changed++;
+      }
+      let saveErr: string | null = null;
+      if (changed > 0) {
+        setProgress("キーボードに保存中…");
+        saveErr = await backend.save();
+      }
+      await reload();
+      const parts = [
+        changed ? `${changed}個のキーを変更してキーボードに保存しました` : "変わるキーはありませんでした",
+        failed ? `${failed}個は書き込めませんでした` : "",
+        skipped ? `${skipped}個はこのファームウェアにない動作なので飛ばしました` : "",
+        saveErr ?? "",
+      ].filter(Boolean);
+      setMsg(`「${label}」：${parts.join("。")}`);
+      return changed > 0 || todo.length === 0;
+    } catch (e) {
+      setMsg(`適用の途中で失敗しました：${(e as Error).message ?? e}`);
+      await reload();
+      return false;
+    } finally {
+      setProgress(null);
+      setBusy(false);
+    }
   };
 
   return (
@@ -112,6 +167,8 @@ export function KeymapTab({ backend }: { backend: Backend }) {
         />
       )}
       {sel === null && <div className="hint">キーをクリックすると、割り当てを変えられます。</div>}
+
+      <StoragePanel data={data} layerIdx={layerIdx} busy={busy} progress={progress} onApply={applyStored} />
     </div>
   );
 }
