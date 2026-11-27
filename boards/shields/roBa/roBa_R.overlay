@@ -23,17 +23,17 @@
         device = <&trackball>;
         input-processors = <&roba_mouse_rip>;
 
-        // レイヤー5（SCROLL）を押している間はスクロールに切り替え
+        // レイヤー6（SCROLL）を押している間はスクロールに切り替え
         scroller {
-            layers = <5>;
+            layers = <6>;
             input-processors = <&roba_scroll_rip>;
         };
     };
 
-    // カーソル：速さ・回転・オートマウス（レイヤー4）を設定アプリから変更可能
+    // カーソル：速さ・回転・オートマウス（レイヤー5 MOUSE）を設定アプリから変更可能
     roba_mouse_rip: roba_mouse_rip {
         compatible = "zmk,input-processor-runtime";
-        processor-label = "mouse";
+        processor-label = "cursor";
         type = <INPUT_EV_REL>;
         x-codes = <INPUT_REL_X>;
         y-codes = <INPUT_REL_Y>;
@@ -42,9 +42,9 @@
         rotation-degrees = <0>;
         track-remainders;
 
-        // 従来のオートマウス（玉を動かすとレイヤー4、止めて700msで戻る）と同じ初期値
+        // 従来のオートマウス（玉を動かすとMOUSEレイヤー、止めて700msで戻る）と同じ初期値
         temp-layer-enabled;
-        temp-layer = <4>;
+        temp-layer = <5>;
         temp-layer-activation-delay-ms = <100>;
         temp-layer-deactivation-delay-ms = <700>;
         temp-layer-transparent-behavior = <&trans>;

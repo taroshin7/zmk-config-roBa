@@ -104,7 +104,11 @@ export function keyFace(binding: Binding | undefined, behaviors: BehaviorInfo[],
     case "Bluetooth": {
       const set = b.metadata.find((s) => s.param1.some((d) => d.constant === binding.param1));
       const cmd = binding.param1;
-      if (cmd === 3) return { main: `BT ${binding.param2}`, hold: "選択", kind: "bt", title: `プロファイル${binding.param2}に切り替え` };
+      if (cmd === 3) {
+        // roBa では プロファイル1＝PC、2＝スマホ
+        const who = binding.param2 === 1 ? "PC" : binding.param2 === 2 ? "スマホ" : "選択";
+        return { main: `BT ${binding.param2}`, hold: who, kind: "bt", title: `プロファイル${binding.param2}（${who}）に切り替え` };
+      }
       if (cmd === 0) return { main: "BT消去", kind: "danger", title: "選択中のプロファイルのペアリングを削除" };
       if (cmd === 4) return { main: "BT全消去", kind: "danger", title: "すべてのペアリングを削除" };
       if (cmd === 1) return { main: "BT次", kind: "bt", title: "次のプロファイル" };

@@ -23,11 +23,13 @@ export function TrackballTab({ backend }: { backend: Backend }) {
   const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [layerNames, setLayerNames] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     try {
       setErr(null);
       setProcs(await backend.listProcessors());
+      setLayerNames(await backend.getLayerNames().catch(() => []));
     } catch (e) {
       setErr(String((e as Error).message ?? e));
     }
@@ -64,7 +66,7 @@ export function TrackballTab({ backend }: { backend: Backend }) {
   if (err) return <div className="card error">トラックボール設定を読み込めませんでした：{err}</div>;
   if (!procs) return <div className="card loading">トラックボール設定を読み込み中…</div>;
 
-  const mouse = procs.find((p) => p.name === "mouse") ?? procs[0];
+  const mouse = procs.find((p) => p.name === "cursor" || p.name === "mouse") ?? procs[0];
   const scroll = procs.find((p) => p.name === "scroll");
 
   return (
@@ -74,7 +76,7 @@ export function TrackballTab({ backend }: { backend: Backend }) {
       </div>
       <div className="tb-grid">
         {mouse && <CursorCard p={mouse} send={send} backend={backend} />}
-        {mouse && <AutoMouseCard p={mouse} send={send} />}
+        {mouse && <AutoMouseCard p={mouse} send={send} layerNames={layerNames} />}
         {scroll && <ScrollCard p={scroll} send={send} backend={backend} />}
         <HelpCard />
       </div>
@@ -160,7 +162,7 @@ function CursorCard({ p, send, backend }: { p: InputProcessorInfo; send: Send; b
   );
 }
 
-function AutoMouseCard({ p, send }: { p: InputProcessorInfo; send: Send }) {
+function AutoMouseCard({ p, send, layerNames }: { p: InputProcessorInfo; send: Send; layerNames: string[] }) {
   const [deact, setDeact] = useDebounced(p.tempLayerDeactivationDelayMs, (v) =>
     send({ setTempLayerDeactivationDelay: { id: p.id, deactivationDelayMs: v } }, p.id, { tempLayerDeactivationDelayMs: v }),
   );
@@ -171,7 +173,7 @@ function AutoMouseCard({ p, send }: { p: InputProcessorInfo; send: Send }) {
     <section className="card tb-card">
       <div className="tb-head">
         <h3>オートマウス</h3>
-        <span className="val">{p.tempLayerEnabled ? `レイヤー${p.tempLayerLayer}` : "オフ"}</span>
+        <span className="val">{p.tempLayerEnabled ? (layerNames[p.tempLayerLayer] ?? `レイヤー${p.tempLayerLayer}`) : "オフ"}</span>
       </div>
       <label className="check big">
         <input
@@ -187,10 +189,9 @@ function AutoMouseCard({ p, send }: { p: InputProcessorInfo; send: Send }) {
           value={p.tempLayerLayer}
           onChange={(e) => send({ setTempLayerLayer: { id: p.id, layer: Number(e.target.value) } }, p.id, { tempLayerLayer: Number(e.target.value) })}
         >
-          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+          {(layerNames.length ? layerNames : Array.from({ length: 8 }, (_, i) => `レイヤー${i}`)).map((n, i) => (
             <option key={i} value={i}>
-              レイヤー{i}
-              {i === 4 ? "（MOUSE）" : ""}
+              {i}: {n}
             </option>
           ))}
         </select>

@@ -9,7 +9,7 @@
 };
 
 &trackball {
-    // オートマウス（レイヤー4）とスクロール（レイヤー5）は、
+    // オートマウス（MOUSE＝レイヤー5）とスクロール（SCROLL＝レイヤー6）は、
     // 設定アプリから調整できるよう roBa_R.overlay の入力プロセッサで処理しています。
 
     // arrows {
@@ -81,10 +81,25 @@
         default_layer {
             display-name = "Base";
             bindings = <
-&kp Q             &kp W         &kp E         &kp R                &kp T                                          &kp Y        &kp U  &lt 5 I    &kp O    &kp P
+&kp Q             &kp W         &kp E         &kp R                &kp T                                          &kp Y        &kp U  &lt 6 I    &kp O    &kp P
 &mt LEFT_SHIFT A  &kp S         &kp D         &kp F                &kp G        &kp LS(LG(S))      &kp MINUS      &kp H        &kp J  &kp K      &kp L    &mt RIGHT_SHIFT LEFT_BRACKET
 &kp Z             &kp X         &kp C         &kp V                &kp B        &kp F7             &kp SLASH      &kp N        &kp M  &kp COMMA  &kp DOT  &kp RIGHT_BRACKET
-&kp ESCAPE        &kp LEFT_WIN  &kp LEFT_ALT  &mt LCTRL LA(GRAVE)  &lt 1 SPACE  &kp LS(SPACE)      &kp BACKSPACE  &lt 2 ENTER                             &kp TAB
+&kp ESCAPE        &kp LEFT_WIN  &kp LEFT_ALT  &mt LCTRL LA(GRAVE)  &lt 2 SPACE  &kp LS(SPACE)      &kp BACKSPACE  &lt 3 ENTER                             &kp TAB
+            >;
+
+            sensor-bindings = <&inc_dec_kp LEFT_ARROW RIGHT_ARROW>;
+        };
+
+        phone_layer {
+            // スマホ（Bluetoothプロファイル2）につながっている間だけ自動でオンになるレイヤー。
+            // Base と同じ。ただし左親指（長押しCtrl）のタップを、Androidの日本語／英語切り替え（Ctrl+Space）にしている。
+            // roBa Studio で自由に変更できます。
+            display-name = "PHONE";
+            bindings = <
+&kp Q             &kp W         &kp E         &kp R                &kp T                                          &kp Y        &kp U  &lt 6 I    &kp O    &kp P
+&mt LEFT_SHIFT A  &kp S         &kp D         &kp F                &kp G        &kp LS(LG(S))      &kp MINUS      &kp H        &kp J  &kp K      &kp L    &mt RIGHT_SHIFT LEFT_BRACKET
+&kp Z             &kp X         &kp C         &kp V                &kp B        &kp F7             &kp SLASH      &kp N        &kp M  &kp COMMA  &kp DOT  &kp RIGHT_BRACKET
+&kp ESCAPE        &kp LEFT_WIN  &kp LEFT_ALT  &mt LCTRL LC(SPACE)   &lt 2 SPACE  &kp LS(SPACE)      &kp BACKSPACE  &lt 3 ENTER                             &kp TAB
             >;
 
             sensor-bindings = <&inc_dec_kp LEFT_ARROW RIGHT_ARROW>;
@@ -103,7 +118,7 @@
         NUM {
             display-name = "NUM";
             bindings = <
-&bt BT_SEL 0                &bt BT_SEL 1     &bt BT_SEL 2     &bt BT_SEL 3     &bt BT_SEL 4                                       &kp RA(Y)         &kp RA(U)          &kp UP_ARROW    &kp RA(O)        &kp PRINTSCREEN
+&bt BT_SEL 1                &bt BT_SEL 2     &bt BT_SEL 2     &bt BT_SEL 3     &bt BT_SEL 4                                       &kp RA(Y)         &kp RA(U)          &kp UP_ARROW    &kp RA(O)        &kp PRINTSCREEN
 &kp SLASH                   &kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp ASTERISK  &kp PRINTSCREEN      &kp UNDERSCORE  &kp EXCLAMATION   &kp LEFT_ARROW     &kp DOWN_ARROW  &kp RIGHT_ARROW  &kp PERCENT
 &mt LEFT_SHIFT KP_NUMBER_0  &kp KP_NUMBER_1  &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp PERIOD    &kp EQUAL            &trans          &kp LEFT_BRACKET  &kp RIGHT_BRACKET  &kp DOWN_ARROW  &kp RIGHT_BRACE  &kp BACKSLASH
 &bt BT_CLR_ALL              &trans           &trans           &trans           &trans        &trans               &trans          &trans                                                                &kp PIPE

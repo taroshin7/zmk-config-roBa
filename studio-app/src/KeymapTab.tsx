@@ -150,6 +150,11 @@ export function KeymapTab({ backend }: { backend: Backend }) {
         </div>
       )}
 
+      {layer.name === "PHONE" && (
+        <div className="phone-note">
+          📱 このレイヤーは、スマホ（Bluetoothプロファイル2）につながっている間だけ自動で使われます。PCのときは Base が使われます。
+        </div>
+      )}
       <div className="card board-card">
         <Board data={data} layerIdx={layerIdx} sel={sel} onSelect={setSel} />
         <Legend />

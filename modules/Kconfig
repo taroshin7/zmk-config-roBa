@@ -1,0 +1,2 @@
+rsource "runtime-input-processor/Kconfig"
+rsource "host-layer/Kconfig"

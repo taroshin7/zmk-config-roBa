@@ -65,6 +65,7 @@ export interface Backend {
   save(): Promise<string | null>;
   discard(): Promise<void>;
   hasTrackball(): boolean;
+  getLayerNames(): Promise<string[]>;
   listProcessors(): Promise<InputProcessorInfo[]>;
   setProcessor(id: number, req: Partial<RipRequest>): Promise<string | null>;
   resetProcessor(id: number): Promise<void>;
@@ -159,6 +160,11 @@ export class DeviceBackend implements Backend {
 
   hasTrackball() {
     return this.rip !== null;
+  }
+
+  async getLayerNames() {
+    const km = await call_rpc(this.conn, { keymap: { getKeymap: true } });
+    return (km.keymap?.getKeymap?.layers ?? []).map((l, i) => l.name || (i === 0 ? "Base" : `L${i}`));
   }
 
   private async ripCall(req: RipRequest): Promise<RipResponse | null> {
@@ -285,7 +291,6 @@ const DEMO_KEYS: KeyAttrs[] = (
   ] as number[][]
 ).map(([x, y, r = 0, rx = 0, ry = 0]) => ({ width: 100, height: 100, x, y, r, rx, ry }));
 
-const DEMO_LAYER_NAMES = ["Base", "FUNCTION", "NUM", "ARROW", "MOUSE", "SCROLL", "LAYER6"];
 
 function defaultProcessors(): InputProcessorInfo[] {
   const base = {
@@ -301,11 +306,11 @@ function defaultProcessors(): InputProcessorInfo[] {
     {
       ...base,
       id: 0,
-      name: "mouse",
+      name: "cursor",
       scaleMultiplier: 1,
       scaleDivisor: 1,
       tempLayerEnabled: true,
-      tempLayerLayer: 4,
+      tempLayerLayer: 5,
       tempLayerActivationDelayMs: 100,
       tempLayerDeactivationDelayMs: 700,
       xyToScrollEnabled: false,
@@ -340,7 +345,7 @@ export class DemoBackend implements Backend {
     const layers = (demoKeymap as { name: string; bindings: [string, number, number][] }[]).map(
       (l, i) => ({
         id: i,
-        name: DEMO_LAYER_NAMES[i] ?? l.name,
+        name: l.name,
         bindings: l.bindings.map(([n, p1, p2]) => ({ behaviorId: behaviorId(n), param1: p1, param2: p2 })),
       }),
     );
@@ -368,6 +373,9 @@ export class DemoBackend implements Backend {
   }
   hasTrackball() {
     return true;
+  }
+  async getLayerNames() {
+    return this.current.map((l) => l.name);
   }
   async listProcessors() {
     return structuredClone(this.procs);

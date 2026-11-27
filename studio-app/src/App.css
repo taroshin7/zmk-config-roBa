@@ -866,3 +866,11 @@ main {
 .mini .k-mouse {
   background: #e6f3f7;
 }
+.phone-note {
+  margin: -6px 0 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #eef4ff;
+  color: #2a4f9c;
+  font-size: 13.5px;
+}

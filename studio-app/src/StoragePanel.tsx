@@ -72,9 +72,14 @@ export function StoragePanel({
       return withBackup(targets, item.name.replace(/^「(.*)」を適用する前$/, "$1") + " の取り消し");
     }
     if (item.kind === "keymap") {
+      // レイヤーの並びが変わっても合うように、名前が同じレイヤーへ書き込む（名前がなければ同じ番号へ）
+      const names = data.layers.map((l) => layerName(data.layers, l.id));
       const targets = item.layers
-        .map((layer, index) => ({ index, layer }))
-        .filter((t) => data.layers[t.index]);
+        .map((layer, i) => {
+          const byName = layer.name ? names.indexOf(layer.name) : -1;
+          return { index: byName >= 0 ? byName : layer.name && names.length ? -1 : i, layer };
+        })
+        .filter((t) => t.index >= 0 && data.layers[t.index]);
       return withBackup(targets, item.name);
     }
     return withBackup([{ index: layerIdx, layer: item.layers[0] }], item.name);

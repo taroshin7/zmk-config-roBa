@@ -1,0 +1,16 @@
+config ROBA_HOST_LAYER
+    bool "接続先（PC／スマホ）に合わせてキーマップのレイヤーを自動で切り替える"
+    default n
+    depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+
+if ROBA_HOST_LAYER
+
+config ROBA_HOST_LAYER_PHONE_PROFILE
+    int "スマホを登録した Bluetooth プロファイル番号（0〜4）"
+    default 2
+
+config ROBA_HOST_LAYER_PHONE_LAYER
+    int "スマホ用キーマップのレイヤー番号"
+    default 1
+
+endif
